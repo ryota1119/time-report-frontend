@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 画面一覧
+
+| ページ         | パス                      |
+|-------------|-------------------------|
+| LPページ       | /                       |
+| 組織登録ページ     | /register               |
+| ログインページ     | /login                  |
+| ログアウトページ    | /logout                 |
+| ログアウト完了ページ  | /logout/complete        |
+| ダッシュボードページ  | /dashboard              |
+| プロフィールページ   | /profile                |
+| 顧客一覧ページ     | /customers              |
+| 顧客詳細ページ     | /customers/{customerID} |
+| プロジェクト一覧ページ | /projects               |
+| プロジェクト詳細ページ | /projects/{projectID}   |
+| ユーザー一覧ページ   | /users                  |
+| ユーザー一覧ページ   | /users/{userID}         |# time-report-frontend
