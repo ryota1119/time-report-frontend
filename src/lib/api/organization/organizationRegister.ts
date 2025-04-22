@@ -1,14 +1,5 @@
-export const checkOrganization = async (orgCode: string) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/organizations/${orgCode}`);
+import apiClient from "@/lib/api/apiClient";
 
-    if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || '登録に失敗しました');
-    }
-
-    return res;
-
-};
 
 export const registerOrganization = async (data: {
     organization_code: string;
@@ -17,16 +8,11 @@ export const registerOrganization = async (data: {
     user_email: string;
     password: string;
 }) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/organizations/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || '登録に失敗しました');
+    try {
+        return await apiClient.post('/organizations/register', data);
+    } catch (e: unknown) {
+        const error = e as Error;
+        throw new Error(error.message || '登録に失敗しました');
     }
 
-    return res;
 };
