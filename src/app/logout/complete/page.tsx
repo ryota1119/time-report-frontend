@@ -1,10 +1,13 @@
 import Link from "next/link";
+import Button from "@/components/ui/buttons/Button";
 
 export default function LogoutCompletePage() {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <Link href="/" className="bg-white hover:bg-gray-100 font-semibold py-3 px-6 rounded-md shadow transition disabled:opacity-50">
-                トップページ
+        <div className="flex items-center justify-center min-h-screen">
+            <Link href="/">
+                <Button>
+                    トップページ
+                </Button>
             </Link>
         </div>
     )

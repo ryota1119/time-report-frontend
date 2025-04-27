@@ -1,29 +1,39 @@
-import {cookies} from "next/headers";
-import {createSsrApiClient} from "@/lib/api/ssrApiClient";
+'use client'
+
 import {redirect} from "next/navigation";
-import {AxiosError} from "axios";
+import {useEffect, useState} from "react";
+import {User} from "@/types/user";
+import {isAxiosError} from "axios";
+import {fetchUsers} from "@/lib/api/user/user";
 
-export default async function DashboardPage() {
-    const cookieStr = (await cookies()).getAll().map(c => `${c.name}=${c.value}`).join('; ')
-    const client = createSsrApiClient({req: {headers: {cookie: cookieStr}}})
+export default function UsersPage() {
+    const [users, setUsers] = useState<User[]>([]);
 
-    try {
-        const res = await client.get('/users')
-        const users = res.data
-        return (
-            <div>
-                <h1>ユーザー一覧</h1>
-                <div>
-                    <h2>ユーザー一覧</h2>
-                    <pre>{JSON.stringify(users, null, 2)}</pre>
-                </div>
+    useEffect(() => {
+        fetchUsers()
+            .then(res => {
+                setUsers(res);
+            })
+            .catch((e: unknown) => {
+                if (isAxiosError(e) && e.response?.status === 401) {
+                    redirect('/login');
+                }
+                console.error(e);
+            });
+    }, []);
+
+    return (
+        <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">メンバー一覧</h1>
+
+            <div className="space-y-4">
+                {users.map((user) => (
+                    <div key={user.id} className="border p-4 rounded shadow-sm bg-white">
+                        <h2 className="text-lg font-semibold">{user.name}</h2>
+                        <p>権限: {user.role}</p>
+                    </div>
+                ))}
             </div>
-        )
-    } catch (e: unknown) {
-        const error = e as AxiosError;
-        if (error.response?.status === 401) {
-            redirect('/login')
-        }
-        throw e
-    }
+        </div>
+    );
 }

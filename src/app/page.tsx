@@ -1,7 +1,11 @@
+import {Card} from "@/components/ui/card/Card";
+
 export default async function Home() {
     return (
-        <main className="p-8 text-xl">
-            LPページ
-        </main>
+        <div className="min-h-screen flex items-center justify-center">
+            <Card>
+                LPページ：未実装
+            </Card>
+        </div>
     );
 }

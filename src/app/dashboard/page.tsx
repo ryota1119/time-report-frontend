@@ -1,29 +1,17 @@
-import {cookies} from "next/headers";
-import {createSsrApiClient} from "@/lib/api/ssrApiClient";
-import {redirect} from "next/navigation";
-import {AxiosError} from "axios";
+'use client'
 
-export default async function DashboardPage() {
-    const cookieStr = (await cookies()).getAll().map(c => `${c.name}=${c.value}`).join('; ')
-    const client = createSsrApiClient({req: {headers: {cookie: cookieStr}}})
+import {Card} from "@/components/ui/card/Card";
+import TimerCard from "@/components/common/TimerCard";
 
-    try {
-        const res = await client.get('/customers')
-        const users = res.data
+export default function DashboardPage() {
     return (
-        <div>
-            <h1>ダッシュボード</h1>
-            <div>
-                <h2>ユーザー一覧</h2>
-                <pre>{JSON.stringify(users, null, 2)}</pre>
+        <>
+            <TimerCard/>
+            <div className="min-h-[calc(100vh-96px)] flex items-center justify-center">
+                <Card>
+                    ダッシュボード：未実装
+                </Card>
             </div>
-        </div>
-    )
-    } catch (e: unknown) {
-        const error = e as AxiosError;
-        if (error.response?.status === 401) {
-            redirect('/login')
-        }
-        throw e
-    }
+        </>
+    );
 }

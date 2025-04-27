@@ -1,30 +1,22 @@
-'use client'
+'use client';
 
 import {useState} from 'react';
-import {AnimatePresence, motion, usePresenceData, wrap} from 'motion/react';
-import Step1 from '@/components/register/Step1';
-import Step2 from '@/components/register/Step2';
-import Step3 from '@/components/register/Step3';
 import {isAxiosError} from 'axios';
+import {AnimatePresence, Variants} from 'motion/react';
 import apiClient from "@/lib/api/apiClient";
+import Step1 from "@/components/register/Step1";
+import Step2 from "@/components/register/Step2";
+import Step3 from "@/components/register/Step3";
 
 export default function RegisterPage() {
-    const steps = [1, 2, 3];
-    const [currentStep, setCurrentStep] = useState(steps[0]);
+    const [step, setStep] = useState(1);
     const [direction, setDirection] = useState<1 | -1>(1);
-
     const [orgCode, setOrgCode] = useState('');
     const [orgName, setOrgName] = useState('');
     const [userName, setUserName] = useState('');
-    const [userEmail, setUserEmail] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    const setSlide = (newDir: 1 | -1) => {
-        const nextStep = wrap(1, steps.length + 1, currentStep + newDir);
-        setCurrentStep(nextStep);
-        setDirection(newDir);
-    };
 
     const handleCheckOrganization = async () => {
         setError('');
@@ -35,14 +27,12 @@ export default function RegisterPage() {
                 return;
             }
         } catch (error: unknown) {
-            if (isAxiosError(error)) {
-                if (error.response?.status === 404) {
-                    setSlide(1);
-                    return;
-                }
-            } else {
-                setError('予期せぬエラーが発生しました');
+            if (isAxiosError(error) && error.response?.status === 404) {
+                setDirection(1);
+                setStep(2);
+                return;
             }
+            setError('予期せぬエラーが発生しました');
         }
     };
 
@@ -53,10 +43,11 @@ export default function RegisterPage() {
                 organization_code: orgCode,
                 organization_name: orgName,
                 user_name: userName,
-                user_email: userEmail,
+                user_email: email,
                 password: password,
             });
-            setSlide(1);
+            setDirection(1);
+            setStep(3);
         } catch (error: unknown) {
             if (isAxiosError(error)) {
                 setError(error.message || '予期せぬエラーが発生しました');
@@ -66,73 +57,48 @@ export default function RegisterPage() {
         }
     };
 
-    const RenderedStep = () => {
-        const directionData = usePresenceData();
-        switch (currentStep) {
-            case 1:
-                return (
-                    <motion.div
-                        key="step1"
-                        initial={{opacity: 0, x: directionData * 50}}
-                        animate={{opacity: 1, x: 0}}
-                        exit={{opacity: 0, x: directionData * -50}}
-                        transition={{duration: 0.3}}
-                    >
-                        <Step1
-                            orgCode={orgCode}
-                            orgName={orgName}
-                            onChangeCode={setOrgCode}
-                            onChangeName={setOrgName}
-                            onNext={handleCheckOrganization}
-                            error={error}
-                        />
-                    </motion.div>
-                );
-            case 2:
-                return (
-                    <motion.div
-                        key="step2"
-                        initial={{opacity: 0, x: directionData * 50}}
-                        animate={{opacity: 1, x: 0}}
-                        exit={{opacity: 0, x: directionData * -50}}
-                        transition={{duration: 0.3}}
-                    >
-                        <Step2
-                            userName={userName}
-                            userEmail={userEmail}
-                            password={password}
-                            onChangeName={setUserName}
-                            onChangeEmail={setUserEmail}
-                            onChangePassword={setPassword}
-                            onBack={() => setSlide(-1)}
-                            onRegister={handleRegister}
-                            error={error}
-                        />
-                    </motion.div>
-                );
-            case 3:
-                return (
-                    <motion.div
-                        key="step3"
-                        initial={{opacity: 0, x: directionData * 50}}
-                        animate={{opacity: 1, x: 0}}
-                        exit={{opacity: 0, x: directionData * -50}}
-                        transition={{duration: 0.3}}
-                    >
-                        <Step3/>
-                    </motion.div>
-                );
-            default:
-                return null;
-        }
+    const stepVariants: Variants | undefined = {
+        initial: (dir: number) => ({x: dir * 100, opacity: 0}),
+        animate: {x: 0, opacity: 1},
+        exit: (dir: number) => ({x: dir * -100, opacity: 0}),
     };
 
     return (
-        <main className="p-6 max-w-md mx-auto">
-            <h1 className="text-2xl font-bold mb-6">組織登録</h1>
-            <AnimatePresence custom={direction} initial={false} mode="popLayout">
-                <RenderedStep key={currentStep}/>
+        <div className="min-h-screen flex items-center justify-center">
+            <AnimatePresence mode="wait" initial={false} custom={direction}>
+                {step === 1 && (
+                    <Step1
+                        direction={direction}
+                        orgCode={orgCode}
+                        orgName={orgName}
+                        setOrgCode={setOrgCode}
+                        setOrgName={setOrgName}
+                        handleCheckOrganization={handleCheckOrganization}
+                        error={error}
+                        stepVariants={stepVariants}
+                    />
+                )}
+                {step === 2 && (
+                    <Step2
+                        direction={direction}
+                        userName={userName}
+                        email={email}
+                        password={password}
+                        error={error}
+                        setUserName={setUserName}
+                        setEmail={setEmail}
+                        setPassword={setPassword}
+                        setDirection={setDirection}
+                        setStep={setStep}
+                        handleRegister={handleRegister}
+                        stepVariants={stepVariants}
+                    />
+                )}
+
+                {step === 3 && (
+                    <Step3 direction={direction} stepVariants={stepVariants}/>
+                )}
             </AnimatePresence>
-        </main>
+        </div>
     );
 }
