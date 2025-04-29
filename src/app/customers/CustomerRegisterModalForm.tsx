@@ -3,11 +3,11 @@
 import React, {useCallback, useMemo, useState} from "react";
 import {CsrApiClient} from "@/lib/api/client/CsrApiClient";
 import {handleApiError} from "@/lib/api/errorHandler";
-import {Input} from "@/components/ui/form/Input";
-import Button from "@/components/ui/buttons/Button";
-import {Card} from "@/components/ui/card/Card";
-import {CardTitle} from "@/components/ui/card/CardTitle";
-import ButtonCancel from "@/components/ui/buttons/ButtonCancel";
+import {Input} from "@/components/elements/form/Input";
+import Button from "@/components/elements/buttons/Button";
+import {Card} from "@/components/elements/card/Card";
+import {CardTitle} from "@/components/elements/card/CardTitle";
+import ButtonCancel from "@/components/elements/buttons/ButtonCancel";
 
 export default function CustomerRegisterModalForm() {
     const [isOpen, setIsOpen] = useState(false);

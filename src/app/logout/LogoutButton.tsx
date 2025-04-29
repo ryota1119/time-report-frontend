@@ -1,7 +1,7 @@
 'use client'
 
 import {useState} from "react";
-import Button from "@/components/ui/buttons/Button";
+import Button from "@/components/elements/buttons/Button";
 import {CsrApiClient} from "@/lib/api/client/CsrApiClient";
 import {handleApiError} from "@/lib/api/errorHandler";
 
@@ -14,7 +14,7 @@ export default function LogoutButton() {
         setError(null)
 
         const apiClient = new CsrApiClient()
-        await apiClient.delete("/api/auth/logout")
+        await apiClient.logout()
             .then(() => {
                 window.location.href = '/logout/complete';
             })

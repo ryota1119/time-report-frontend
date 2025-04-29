@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Button from "@/components/ui/buttons/Button";
-import {Card} from "@/components/ui/card/Card";
-import {CardText} from "@/components/ui/card/CardText";
+import Button from "@/components/elements/buttons/Button";
+import {Card} from "@/components/elements/card/Card";
+import {CardText} from "@/components/elements/card/CardText";
 
 export default function LogoutCompletePage() {
     return (

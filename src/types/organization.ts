@@ -1,4 +1,4 @@
-export type OrganizationRegisterResponse = {
+export type Organization = {
     organizationCode: string
     organizationName: string
 };

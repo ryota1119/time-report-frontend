@@ -7,6 +7,7 @@ type HandledApiError = {
 
 export const handleApiError = (error: unknown): HandledApiError => {
     if (isAxiosError(error)) {
+        console.log(error);
         if (!error.response) {
             return { message: 'ネットワークエラーが発生しました', statusCode: 0 };
         }

@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
+import {SsrApiClient} from "@/lib/api/client/SsrApiClient";
 import {Customer} from "@/types/customer";
 import {handleApiError} from "@/lib/api/errorHandler";
 
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const accessToken = req.cookies.get("access_token")?.value || "";
 
-    const apiClient = new BackendApiClient({ accessToken })
+    const apiClient = new SsrApiClient({ accessToken })
     try {
         const res = await apiClient.post<Customer>("/customers", {
             name,

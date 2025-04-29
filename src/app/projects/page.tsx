@@ -1,12 +1,40 @@
-import {getProjects} from "@/lib/api/project/project";
-import {Card} from "@/components/ui/card/Card";
+import {Card} from "@/components/elements/card/Card";
+import {cookies} from "next/headers";
+import {SsrApiClient} from "@/lib/api/client/SsrApiClient";
+import {handleApiError} from "@/lib/api/errorHandler";
+import {User} from "@/types/user";
+import CustomerRegisterModalForm from "@/app/customers/CustomerRegisterModalForm";
+import {Project} from "@/types/project";
 
 export default async function ProjectsPage() {
-    const projects = await getProjects();
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('access_token')?.value;
+
+    let projects: Project[] = [];
+    const apiClient = new SsrApiClient({accessToken})
+    try {
+        projects = await apiClient.fetchProjects()
+    } catch (error) {
+        const {message} = handleApiError(error);
+        throw new Error(message);
+    }
+
+    let user: User | null = null;
+    try {
+        user = await apiClient.fetchCurrentUser()
+    } catch (error) {
+        const {message} = handleApiError(error);
+        throw new Error(message);
+    }
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">プロジェクト一覧</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">プロジェクト</h1>
+                {user.role === "admin" &&
+                    <CustomerRegisterModalForm/>
+                }
+            </div>
 
             <div className="space-y-4">
                 {projects.map((project) => (

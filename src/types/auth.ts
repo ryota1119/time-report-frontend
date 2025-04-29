@@ -1,5 +1,5 @@
-export type LoginResponse = {
+export type AuthToken = {
     access_token: string;
-    expires_at: string; // ISO8601形式の文字列
+    expires_at: string;
     refresh_token: string;
 };

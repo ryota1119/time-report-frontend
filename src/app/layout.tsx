@@ -1,10 +1,11 @@
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header/Header";
+import Header from "@/components/layouts/Header/Header";
 import {cookies} from "next/headers";
-import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
+import {SsrApiClient} from "@/lib/api/client/SsrApiClient";
 import {User} from "@/types/user";
+import {handleApiError} from "@/lib/api/errorHandler";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -30,12 +31,17 @@ export default async function RootLayout({
     const accessToken = cookieStore.get('access_token')?.value;
 
     let user: User | null = null;
-    const apiClient = new BackendApiClient({accessToken})
-    await apiClient.get<User>("/users/me")
-        .then((res) => {
-            user = res.data;
-        })
-        .catch(() => {});
+    const apiClient = new SsrApiClient({accessToken})
+    try {
+        user = await apiClient.fetchCurrentUser();
+    } catch (error) {
+        const { statusCode } = handleApiError(error);
+        if (statusCode === 401) {
+            user = null;
+        } else {
+            throw error;
+        }
+    }
 
     return (
         <html lang="ja">

@@ -1,5 +1,5 @@
 import {fetchUsers} from "@/lib/api/user/user";
-import {Card} from "@/components/ui/card/Card";
+import {Card} from "@/components/elements/card/Card";
 
 export default async function UsersPage() {
     const users = await fetchUsers();

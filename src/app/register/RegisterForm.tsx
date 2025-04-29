@@ -1,13 +1,12 @@
 'use client'
 
 import {AnimatePresence, Variants} from "motion/react";
-import Step1 from "@/components/register/Step1";
-import Step2 from "@/components/register/Step2";
-import Step3 from "@/components/register/Step3";
+import Step1 from "@/components/features/register/Step1";
+import Step2 from "@/components/features/register/Step2";
+import Step3 from "@/components/features/register/Step3";
 import {useState} from "react";
-import apiClient from "@/lib/api/apiClient";
-import {AxiosError, AxiosResponse, isAxiosError} from "axios";
 import {CsrApiClient} from "@/lib/api/client/CsrApiClient";
+import {handleApiError} from "@/lib/api/errorHandler";
 
 export default function RegisterForm() {
     const [step, setStep] = useState(1);
@@ -23,42 +22,41 @@ export default function RegisterForm() {
         setError('');
 
         const apiClient = new CsrApiClient()
-        await apiClient.get(`/api/organizations/${organizationCode}`)
-            .then((res: AxiosResponse) => {
-                if (res.status === 200) {
-                    setError('この組織コードは既に使われています。');
-                    return;
-                }
-            })
-            .catch((err: AxiosError) => {
-                if (err.response?.status === 404) {
-                    setDirection(1);
-                    setStep(2);
-                    return;
-                }
-                setError('予期せぬエラーが発生しました');
-            })
+        try {
+            const data = await apiClient.fetchOrganizationByCode(organizationCode)
+            if (data) {
+                setError('この組織コードは既に使われています。');
+                return;
+            }
+        } catch (error) {
+            const {message, statusCode} = handleApiError(error);
+            if (statusCode === 404) {
+                setDirection(1);
+                setStep(2);
+                return;
+            }
+            setError(message);
+        }
     };
 
     const handleRegister = async () => {
         setError('');
 
         const apiClient = new CsrApiClient()
-        await apiClient.post(`/api/organizations/register`, {
-            organizationCode,
-            organizationName,
-            userName,
-            email,
-            password,
-        })
-            .then(() => {
-                setDirection(1);
-                setStep(3);
-            })
-            .catch((err: AxiosError) => {
-                setError(err.message || '予期せぬエラーが発生しました');
-
-            })
+        try {
+            await apiClient.createOrganization(
+                organizationCode,
+                organizationName,
+                userName,
+                email,
+                password,
+            )
+            setDirection(1);
+            setStep(3);
+        } catch (error) {
+            const {message} = handleApiError(error);
+            setError(message);
+        }
     };
 
     const stepVariants: Variants | undefined = {

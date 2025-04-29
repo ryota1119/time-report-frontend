@@ -1,7 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {AxiosError} from "axios";
-import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
-import {LoginResponse} from "@/types/auth";
+import {SsrApiClient} from "@/lib/api/client/SsrApiClient";
 import {handleApiError} from "@/lib/api/errorHandler";
 
 export async function POST(req: NextRequest) {
@@ -14,16 +12,11 @@ export async function POST(req: NextRequest) {
 
     const accessToken = req.cookies.get("access_token")?.value || "";
 
-    const apiClient = new BackendApiClient({ accessToken })
-
+    const apiClient = new SsrApiClient({accessToken})
     try {
-        const res = await apiClient.post<LoginResponse>("/auth/login", {
-            organizationCode,
-            email,
-            password,
-        })
+        const data = await apiClient.login(organizationCode, email, password,)
 
-        const {access_token, refresh_token, expires_at} = res.data
+        const {access_token, refresh_token, expires_at} = data
 
         const response = NextResponse.json({message: 'ログイン成功'})
 
@@ -47,7 +40,6 @@ export async function POST(req: NextRequest) {
         return response
     } catch (error) {
         const {message, statusCode} = handleApiError(error)
-        console.log(message)
         return NextResponse.json({message: message}, {status: statusCode})
     }
 }

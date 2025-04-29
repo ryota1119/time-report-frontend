@@ -1,5 +1,5 @@
 import {cookies} from "next/headers";
-import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
+import {SsrApiClient} from "@/lib/api/client/SsrApiClient";
 import {Customer} from "@/types/customer";
 import {handleApiError} from "@/lib/api/errorHandler";
 import CustomerRegisterModalForm from "@/app/customers/CustomerRegisterModalForm";
@@ -10,16 +10,10 @@ export default async function CustomersPage() {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('access_token')?.value;
 
-    if (!accessToken) {
-        throw new Error('アクセストークンがありません');
-    }
-
-    const apiClient = new BackendApiClient({accessToken})
-
     let customers: Customer[] = [];
+    const apiClient = new SsrApiClient({accessToken})
     try {
-        const res = await apiClient.get<Customer[]>("/customers")
-        customers = res.data
+        customers = await apiClient.fetchCustomers()
     } catch (error) {
         const {message} = handleApiError(error);
         throw new Error(message);
@@ -27,8 +21,7 @@ export default async function CustomersPage() {
 
     let user: User | null = null;
     try {
-        const res = await apiClient.get<User>("/users/me");
-        user = res.data
+        user = await apiClient.fetchCurrentUser()
     } catch (error) {
         const {message} = handleApiError(error);
         throw new Error(message);
@@ -37,13 +30,13 @@ export default async function CustomersPage() {
     return (
         <div className="p-4">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">顧客一覧</h1>
+                <h1 className="text-2xl font-bold">クライアント</h1>
                 {user.role === "admin" &&
                     <CustomerRegisterModalForm/>
                 }
             </div>
 
-            <CustomerList initialCustomers={customers} />
+            <CustomerList initialCustomers={customers}/>
         </div>
     );
 }

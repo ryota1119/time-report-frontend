@@ -2,7 +2,7 @@
 
 import {useCallback, useState} from "react";
 import {Customer} from "@/types/customer";
-import {Card} from "@/components/ui/card/Card";
+import {Card} from "@/components/elements/card/Card";
 import CustomerEditModalForm from "@/app/customers/CustomerEditModalForm";
 
 interface Props {

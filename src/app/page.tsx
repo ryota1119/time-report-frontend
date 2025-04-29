@@ -1,4 +1,4 @@
-import {Card} from "@/components/ui/card/Card";
+import {Card} from "@/components/elements/card/Card";
 
 export default async function Home() {
     return (

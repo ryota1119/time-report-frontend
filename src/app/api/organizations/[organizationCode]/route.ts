@@ -1,19 +1,19 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
-import {isAxiosError} from "axios";
+import {SsrApiClient} from "@/lib/api/client/SsrApiClient";
+import {handleApiError} from "@/lib/api/errorHandler";
 
-export async function GET(req: NextRequest, {params}: { params: { organizationCode: string } }) {
-    const {organizationCode} = params;
+export async function GET(req: NextRequest, {params}: { params: Promise<{ organizationCode: string }> }) {
+    const organizationCode = (await params).organizationCode;
 
-    const apiClient = new BackendApiClient();
-
+    const apiClient = new SsrApiClient();
     try {
-        const res = await apiClient.get(`/organizations/${organizationCode}`);
-        return NextResponse.json(res.data);
-    } catch (e: unknown) {
-        if (isAxiosError(e) && e.status === 404) {
+        const data = await apiClient.fetchOrganizationByCode(organizationCode);
+        return NextResponse.json(data);
+    } catch (error) {
+        const {message, statusCode} = handleApiError(error)
+        if (statusCode === 404) {
             return NextResponse.json({message: '存在しません'}, {status: 404});
         }
-        return NextResponse.json({message: '取得に失敗しました'}, {status: 500});
+        return NextResponse.json({message: message}, {status: statusCode});
     }
 }

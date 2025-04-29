@@ -1,37 +1,28 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import {User} from "@/types/user";
+import {AuthToken} from "@/types/auth";
+import {Organization} from "@/types/organization";
+import {Customer} from "@/types/customer";
+import {Project} from "@/types/project";
+import {Timer} from "@/types/timer";
 
-export class BaseApiClient {
-    protected client: AxiosInstance;
+export abstract class BaseApiClient {
+    abstract login(organizationCode: string, email: string, password: string): Promise<AuthToken>;
 
-    constructor(config: AxiosRequestConfig) {
-        this.client = axios.create(config);
-    }
+    abstract logout(): Promise<void>;
 
-    async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.get<T>(url, config);
-    }
+    abstract fetchCurrentUser(): Promise<User>;
 
-    async post<T = unknown, U = unknown>(url: string, data?: U, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.post<T>(url, data, config);
-    }
+    abstract createOrganization(organizationCode: string, organizationName: string, userName: string, email: string, password: string): Promise<Organization>;
 
-    async put<T = unknown, U = unknown>(url: string, data?: U, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.put<T>(url, data, config);
-    }
+    abstract fetchOrganizationByCode(organizationCode: string): Promise<Organization>;
 
-    async patch<T = unknown, U = unknown>(url: string, data?: U, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.patch<T>(url, data, config);
-    }
+    abstract fetchCustomers(): Promise<Customer[]>;
 
-    async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.delete<T>(url, config);
-    }
+    abstract fetchProjects(): Promise<Project[]>;
 
-    async head<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.head<T>(url, config);
-    }
+    abstract fetchCurrentTimer(): Promise<Timer>
 
-    async options<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return this.client.options<T>(url, config);
-    }
+    abstract startTimer(title: string, memo: string, projectID: number): Promise<Timer>;
+
+    abstract stopTimer(timerID: number, title: string, memo: string, projectID: number): Promise<Timer>;
 }

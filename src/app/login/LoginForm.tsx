@@ -1,10 +1,10 @@
 'use client'
 
 import {useState} from 'react'
-import {Card} from "@/components/ui/card/Card";
-import {CardTitle} from "@/components/ui/card/CardTitle";
-import {Input} from "@/components/ui/form/Input";
-import Button from "@/components/ui/buttons/Button";
+import {Card} from "@/components/elements/card/Card";
+import {CardTitle} from "@/components/elements/card/CardTitle";
+import {Input} from "@/components/elements/form/Input";
+import Button from "@/components/elements/buttons/Button";
 import {CsrApiClient} from "@/lib/api/client/CsrApiClient";
 import {handleApiError} from "@/lib/api/errorHandler";
 
@@ -21,16 +21,12 @@ export default function LoginForm() {
 
         const apiClient = new CsrApiClient()
 
-        await apiClient.post('/api/auth/login', {
-            organizationCode: organizationCode,
-            email: email,
-            password: password,
-        })
+        await apiClient.login(organizationCode, email, password)
             .then(() => {
                 window.location.href = '/dashboard';
             })
             .catch((error) => {
-                const { message } = handleApiError(error);
+                const {message} = handleApiError(error);
                 setError(message);
             })
             .finally(() => {
@@ -41,7 +37,7 @@ export default function LoginForm() {
     return (
         <Card className="w-full max-w-md">
             <CardTitle>ログイン</CardTitle>
-            <Input
+            <Input<"text">
                 label="組織コード"
                 type="text"
                 id="organizationCode"
@@ -50,7 +46,7 @@ export default function LoginForm() {
                 required={true}
                 onChange={setOrganizationCode}
             />
-            <Input
+            <Input<"email">
                 label="メールアドレス"
                 type="email"
                 id="email"
@@ -59,7 +55,7 @@ export default function LoginForm() {
                 required={true}
                 onChange={setEmail}
             />
-            <Input
+            <Input<"password">
                 label="パスワード"
                 type="password"
                 id="password"
