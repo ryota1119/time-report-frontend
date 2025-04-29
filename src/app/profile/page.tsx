@@ -10,7 +10,7 @@ export default async function ProfilePage() {
         user = await getLoginUser();
 
         return  (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-[calc(100vh-96px)] flex items-center justify-center">
                 <Card>
                     <CardTitle>プロフィール</CardTitle>
                     <div className="space-y-2">

@@ -1,41 +1,49 @@
-'use client'
-
-import {redirect} from "next/navigation";
-import {useEffect, useState} from "react";
+import {cookies} from "next/headers";
+import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
 import {Customer} from "@/types/customer";
-import {isAxiosError} from "axios";
-import {fetchCustomers} from "@/lib/api/customer/customers";
+import {handleApiError} from "@/lib/api/errorHandler";
+import CustomerRegisterModalForm from "@/app/customers/CustomerRegisterModalForm";
+import {User} from "@/types/user";
+import CustomerList from "@/app/customers/CustomerList";
 
-export default function CustomersPage() {
-    const [customers, setCustomers] = useState<Customer[]>([]);
+export default async function CustomersPage() {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('access_token')?.value;
 
-    useEffect(() => {
-        fetchCustomers()
-            .then(res => {
-                setCustomers(res);
-            })
-            .catch((e: unknown) => {
-                if (isAxiosError(e) && e.response?.status === 401) {
-                    redirect('/login');
-                }
-                console.error(e);
-            });
-    }, []);
+    if (!accessToken) {
+        throw new Error('アクセストークンがありません');
+    }
+
+    const apiClient = new BackendApiClient({accessToken})
+
+    let customers: Customer[] = [];
+    try {
+        const res = await apiClient.get<Customer[]>("/customers")
+        customers = res.data
+    } catch (error) {
+        const {message} = handleApiError(error);
+        throw new Error(message);
+    }
+
+    let user: User | null = null;
+    try {
+        const res = await apiClient.get<User>("/users/me");
+        user = res.data
+    } catch (error) {
+        const {message} = handleApiError(error);
+        throw new Error(message);
+    }
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">顧客一覧</h1>
-
-            <div className="space-y-4">
-                {customers.map((customer) => (
-                    <div key={customer.id} className="border p-4 rounded shadow-sm bg-white">
-                        <h2 className="text-lg font-semibold">{customer.name}</h2>
-                        <p>単価: ¥{customer.unitPrice}</p>
-                        <p>契約開始日: {customer.startDate}</p>
-                        <p>契約終了日: {customer.endDate}</p>
-                    </div>
-                ))}
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">顧客一覧</h1>
+                {user.role === "admin" &&
+                    <CustomerRegisterModalForm/>
+                }
             </div>
+
+            <CustomerList initialCustomers={customers} />
         </div>
     );
 }

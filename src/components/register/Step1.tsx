@@ -6,22 +6,22 @@ import {Input} from "@/components/ui/form/Input";
 
 interface Step1Props {
     direction: 1 | -1;
-    orgCode: string;
-    orgName: string;
+    organizationCode: string;
+    organizationName: string;
     error: string;
-    setOrgCode: (value: string) => void;
-    setOrgName: (value: string) => void;
+    setOrganizationCode: (value: string) => void;
+    setOrganizationName: (value: string) => void;
     handleCheckOrganization: () => void;
     stepVariants: Variants | undefined
 }
 
 export default function Step1({
                                   direction,
-                                  orgCode,
-                                  orgName,
+                                  organizationCode,
+                                  organizationName,
                                   error,
-                                  setOrgCode,
-                                  setOrgName,
+                                  setOrganizationCode,
+                                  setOrganizationName,
                                   handleCheckOrganization,
                                   stepVariants,
                               }: Step1Props) {
@@ -42,9 +42,9 @@ export default function Step1({
                     type="text"
                     id="organizationCode"
                     placeholder="例: org123"
-                    value={orgCode}
+                    value={organizationCode}
                     required={true}
-                    onChange={setOrgCode}
+                    onChange={setOrganizationCode}
                 >
                     組織コード
                 </Input>
@@ -52,9 +52,9 @@ export default function Step1({
                     type="text"
                     id="organizationName"
                     placeholder="組織名"
-                    value={orgName}
+                    value={organizationName}
                     required={true}
-                    onChange={setOrgName}
+                    onChange={setOrganizationName}
                 >
                     組織名
                 </Input>

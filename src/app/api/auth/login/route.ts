@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {AxiosError} from "axios";
 import {BackendApiClient} from "@/lib/api/client/BackendApiClient";
 import {LoginResponse} from "@/types/auth";
+import {handleApiError} from "@/lib/api/errorHandler";
 
 export async function POST(req: NextRequest) {
     const body = await req.json()
@@ -44,10 +45,9 @@ export async function POST(req: NextRequest) {
         })
 
         return response
-    } catch (e: unknown) {
-        if (e instanceof AxiosError && e.status === 401) {
-            return NextResponse.json({message: '認証エラー'}, {status: 401})
-        }
-        return NextResponse.json({message: 'ログインに失敗しました'}, {status: 500})
+    } catch (error) {
+        const {message, statusCode} = handleApiError(error)
+        console.log(message)
+        return NextResponse.json({message: message}, {status: statusCode})
     }
 }

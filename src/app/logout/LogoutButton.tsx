@@ -1,9 +1,9 @@
 'use client'
 
 import {useState} from "react";
-import {logout} from "@/lib/api/auth/logout";
-import {isAxiosError} from "axios";
 import Button from "@/components/ui/buttons/Button";
+import {CsrApiClient} from "@/lib/api/client/CsrApiClient";
+import {handleApiError} from "@/lib/api/errorHandler";
 
 export default function LogoutButton() {
     const [loading, setLoading] = useState(false)
@@ -12,21 +12,15 @@ export default function LogoutButton() {
     const handleLogout = async () => {
         setLoading(true)
         setError(null)
-        logout()
-            .then(async res => {
-                console.log(res)
-                if (res.status === 200) {
-                    window.location.href = '/logout/complete';
-                } else {
-                    setError('ログアウトに失敗しました。もう一度お試しください。')
-                }
+
+        const apiClient = new CsrApiClient()
+        await apiClient.delete("/api/auth/logout")
+            .then(() => {
+                window.location.href = '/logout/complete';
             })
-            .catch((e: unknown) => {
-                if (isAxiosError(e)) {
-                    setError(`通信エラーが発生しました（${e.response?.status ?? '不明'}）`)
-                } else {
-                    setError('予期しないエラーが発生しました。')
-                }
+            .catch((error) => {
+                const { message } = handleApiError(error);
+                setError(message)
             })
             .finally(() => setLoading(false))
     }

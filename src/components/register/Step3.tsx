@@ -1,6 +1,7 @@
 import {motion, Variants} from "motion/react";
 import Link from "next/link";
 import {Card} from "@/components/ui/card/Card";
+import {CardTitle} from "@/components/ui/card/CardTitle";
 
 interface Step3Props {
     direction: 1 | -1;
@@ -23,7 +24,7 @@ export default function Step3({
             className="w-full max-w-md"
         >
             <Card className={`text-center`}>
-                <p>登録が完了しました！</p>
+                <CardTitle>登録が完了しました！</CardTitle>
                 <Link href="/login"
                       className="inline-block bg-blue-600 text-white py-2 px-4 rounded">
                     ログイン画面へ

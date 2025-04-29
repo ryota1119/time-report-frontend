@@ -1,7 +1,7 @@
 export type Customer = {
     id: number
     name: string
-    unitPrice: number
-    startDate: string
+    unitPrice: number | null
+    startDate: string | null
     endDate: string | null
 }
